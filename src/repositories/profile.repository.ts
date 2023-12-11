@@ -14,3 +14,22 @@ export async function updateProfileById(
     upsert: true,
   });
 }
+
+export async function getDisplayNameByIds(userIds: string[]) {
+  const profiles = await ProfileModel.find(
+    { userId: { $in: userIds } },
+    { _id: 0, userId: 1, displayName: 1 }
+  );
+
+  const profilesMap = new Map(
+    profiles.map((profile) => [profile.userId, profile])
+  );
+
+  const result = userIds.map((userId) => ({
+    userId,
+    displayName:
+      (profilesMap.get(userId) || {}).displayName || "user_unnamed",
+  }));
+
+  return result;
+}

@@ -51,6 +51,10 @@ export async function getFollowersOfUser(userId: string) {
   return followers[0] ?? { followeeId: userId, followerIds: [] };
 }
 
+export async function getFollow(followerId: string, followeeId: string) {
+  return FollowModel.findOne<IFollow | null>({ followerId, followeeId });
+}
+
 export async function getFolloweesOfUser(userId: string) {
   const followees = await FollowModel.aggregate<IFollowees>([
     {

@@ -2,9 +2,11 @@ import { Router } from "express";
 import { authGuard } from "../../guard/auth.guard";
 import { getProfileEndpoint } from "./get-profile";
 import { updateProfileEndpoint } from "./update-profile";
+import { getDisplayNameEndpoint } from "./get-displayname";
 
 const router = Router();
 
+router.get("/displayName", getDisplayNameEndpoint);
 router.get("/:userId", getProfileEndpoint);
 router.patch("/", authGuard, updateProfileEndpoint);
 
