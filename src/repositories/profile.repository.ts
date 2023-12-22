@@ -2,7 +2,37 @@ import { ProfileModel } from "../dao/profile.model";
 import { IUpdateProfile } from "../models/profile.interface";
 
 export async function getProfileById(userId: string) {
-  return await ProfileModel.findOne({ userId });
+  const profile = await ProfileModel.aggregate([
+    {
+      $match: { userId },
+    },
+    {
+      $lookup: {
+        from: "follows",
+        localField: "userId",
+        foreignField: "followeeId",
+        as: "follower",
+      },
+    },
+    {
+      $lookup: {
+        from: "follows",
+        localField: "userId",
+        foreignField: "followerId",
+        as: "followee",
+      },
+    },
+    {
+      $project: {
+        followee: { $size: "$followee" },
+        follower: { $size: "$follower" },
+        shortBio: 1,
+        displayName: 1,
+        userId: 1,
+      },
+    },
+  ]);
+  return profile.length > 0 ? profile[0] : null;
 }
 
 export async function updateProfileById(
@@ -27,8 +57,7 @@ export async function getDisplayNameByIds(userIds: string[]) {
 
   const result = userIds.map((userId) => ({
     userId,
-    displayName:
-      (profilesMap.get(userId) || {}).displayName || "user_unnamed",
+    displayName: (profilesMap.get(userId) || {}).displayName || "user_unnamed",
   }));
 
   return result;
