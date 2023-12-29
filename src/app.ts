@@ -14,7 +14,7 @@ app.use(bodyParser.json());
 
 connectDatabase();
 
-app.use("/apis/profiles", profileRoute);
-app.use("/apis/follows", followRoute);
+app.use("/profiles", profileRoute);
+app.use("/follows", followRoute);
 
 app.listen(port, () => console.log(`Application is running on port ${port}`));
