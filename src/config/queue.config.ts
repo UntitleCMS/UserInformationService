@@ -1,11 +1,11 @@
-import client, { Connection, Channel } from "amqplib";
+import client, { Connection, Channel, ConsumeMessage } from "amqplib";
 
 var rmqUser = "guest";
 var rmqPass = "guest";
 var rmqhost = "localhost";
 var NOTIFICATION_QUEUE = "article/new";
 
-export type HandlerConsumer = (msg: string) => any;
+export type HandlerConsumer = (msg: ConsumeMessage ) => any;
 
 class RabbitMQConnection {
   connection!: Connection;
@@ -35,19 +35,20 @@ class RabbitMQConnection {
     }
   }
 
-  async consume(handleIncomingNotification: HandlerConsumer) {
-    await this.channel.assertQueue(NOTIFICATION_QUEUE, {
+  async consume(queue: string, handleIncomingNotification: HandlerConsumer ) {
+    await this.channel.assertQueue(queue, {
       durable: false,
     });
 
     this.channel.consume(
-      NOTIFICATION_QUEUE,
+      queue,
       (msg) => {
         {
           if (!msg) {
             return console.error(`Invalid incoming message`);
           }
-          handleIncomingNotification(msg?.content?.toString());
+          if (msg )
+          handleIncomingNotification(msg);
           this.channel.ack(msg);
         }
       },

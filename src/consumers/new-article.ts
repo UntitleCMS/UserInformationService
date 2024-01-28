@@ -7,9 +7,9 @@ interface x {
   CreatedAt: Date;
 }
 
-export const newArticle: HandlerConsumer = (msg: string) => {
+export const newArticle: HandlerConsumer = (msg) => {
   console.log("CONSUME EVENT");
-  let data = JSON.parse(msg.toString());
+  let data = JSON.parse(msg.content?.toString() ?? "{}");
   data.CreatedAt = new Date(data.CreatedAt);
 
   const a = ArticleModel.updateOne(
