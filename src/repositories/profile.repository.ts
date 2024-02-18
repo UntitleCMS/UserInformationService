@@ -62,3 +62,14 @@ export async function getDisplayNameByIds(userIds: string[]) {
 
   return result;
 }
+
+export async function getProfilesByName(
+  name: string
+  // offset: number,
+  // limit: number
+) {
+  const startName = new RegExp("^" + name, "i");
+  return await ProfileModel.find({ displayName: { $regex: startName } });
+  // .limit(limit)
+  // .skip((offset - 1) * limit);
+}
