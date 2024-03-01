@@ -5,7 +5,7 @@ var rmqPass = "guest";
 var rmqhost = "localhost";
 var NOTIFICATION_QUEUE = "article/new";
 
-export type HandlerConsumer = (msg: ConsumeMessage ) => any;
+export type HandlerConsumer = (msg: ConsumeMessage) => any;
 
 class RabbitMQConnection {
   connection!: Connection;
@@ -29,13 +29,20 @@ class RabbitMQConnection {
       console.log(`🛸 Created RabbitMQ Channel successfully`);
 
       this.connected = true;
+      return;
     } catch (error) {
       console.error(error);
       console.error(`Not connected to MQ Server`);
+      const x = new Promise((res, rej) => {
+        setTimeout(async () => {
+          this.connect().then(res).catch(rej);
+        }, 2000);
+      });
+      return await x;
     }
   }
 
-  async consume(queue: string, handleIncomingNotification: HandlerConsumer ) {
+  async consume(queue: string, handleIncomingNotification: HandlerConsumer) {
     await this.channel.assertQueue(queue, {
       durable: false,
     });
@@ -47,8 +54,7 @@ class RabbitMQConnection {
           if (!msg) {
             return console.error(`Invalid incoming message`);
           }
-          if (msg )
-          handleIncomingNotification(msg);
+          if (msg) handleIncomingNotification(msg);
           this.channel.ack(msg);
         }
       },
